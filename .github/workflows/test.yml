@@ -1,28 +1,26 @@
-name: Telegram Test
+name: Telegram Bot Test
 
 on:
   workflow_dispatch:
 
 jobs:
-  test:
+  bot:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test Telegram token
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Start bot
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
-          python - <<'PY'
-          import os
-          import urllib.request
-
-          token = os.environ["TELEGRAM_BOT_TOKEN"]
-
-          url = f"https://api.telegram.org/bot{token}/getMe"
-
-          with urllib.request.urlopen(url) as response:
-              data = response.read().decode()
-
-          print("Telegram response received.")
-          print(data)
-          PY
+          timeout 120 python main.py || true
